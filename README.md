@@ -1,2 +1,2 @@
 # shm_mem
-A posix share memory library support Linux platform
+A posix shared memory library support Linux platform
