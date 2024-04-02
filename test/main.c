@@ -7,8 +7,8 @@
 int main( int argc, char ** argv)
 {
 	/// parents
-        shm_mgr_t * ctx = sys_shm_serv_create("my_shm", 1920*1080, 5 );
-        if( ctx == NULL ) {
+        shm_ctx_t * ctx = sys_shm_serv_create("my_shm", 1920*1080, 5 );
+        if( !ctx ) {
                 printf("shm create failed\n");
                 return -1;
         }
@@ -21,8 +21,8 @@ int main( int argc, char ** argv)
 	} else if ( rc == 0 ) {
 		/// child
 
-		shm_mgr_t * ctx_child = sys_shm_cli_connect( "my_shm", 1920*1080, 5 );
-		if( ctx_child == NULL ) {
+		shm_ctx_t * ctx_child = sys_shm_cli_connect( "my_shm", 1920*1080, 5 );
+		if( !ctx_child ) {
 			printf("shm connect failed\n");
 			return -1;
 		}

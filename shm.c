@@ -2,16 +2,32 @@
 /// for different porcess to exchange data
 #include "shm.h"
 
+//  ---------------------------------------
+//  shm_mgr_t| bucket_size| bucket_size|...
+//  ---------------------------------------
 
-void sys_shm_serv_free(  shm_mgr_t * ctx)
+typedef struct {
+    int bucket_size;
+    int bucketn;
+    char name[128];
+
+    sem_t sem;
+
+    int num;
+    int r;
+    int w;
+} shm_mgr_t;
+
+void sys_shm_serv_free( void * p )
 {
+    shm_mgr_t * ctx = (shm_mgr_t*)p;
     sem_destroy(&ctx->sem);
     shm_unlink(ctx->name);
     return;
 }
 
 /// @breif create a shm pool
-shm_mgr_t * sys_shm_serv_create( char * name, int bucket_size, int bucketn )
+void * sys_shm_serv_create( char * name, int bucket_size, int bucketn )
 {
 	assert(strlen(name) > 0);
 	assert(bucket_size > 0);
@@ -63,8 +79,9 @@ shm_mgr_t * sys_shm_serv_create( char * name, int bucket_size, int bucketn )
 }
 
 /// @breif push data into shm pool
-int sys_shm_serv_push( shm_mgr_t * ctx, char * data, int datan )
+int sys_shm_serv_push( void * p, char * data, int datan )
 {
+    shm_mgr_t * ctx = (shm_mgr_t*)p;
     assert(data != NULL);
     assert(datan == ctx->bucket_size);
 
@@ -113,7 +130,7 @@ int sys_shm_serv_push( shm_mgr_t * ctx, char * data, int datan )
 }
 
 /// @breif connect to a exist shm pool
-shm_mgr_t * sys_shm_cli_connect( char * name, int bucket_size, int bucketn)
+void * sys_shm_cli_connect( char * name, int bucket_size, int bucketn)
 {
 	assert(strlen(name) > 0);
 	assert(bucket_size > 0);
@@ -137,8 +154,9 @@ shm_mgr_t * sys_shm_cli_connect( char * name, int bucket_size, int bucketn)
 }
 
 
-int sys_shm_cli_pull( shm_mgr_t * ctx, char * data, int datan )
+int sys_shm_cli_pull( void * p, char * data, int datan )
 {
+    shm_mgr_t * ctx = (shm_mgr_t*)p;
     assert(data != NULL);
     assert(datan == ctx->bucket_size);
 
